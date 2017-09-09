@@ -1,0 +1,15 @@
+#canvas {
+	position: absolute;
+	top: 0;
+	left: 0;
+
+	background: #fff;
+
+	width : 640px;
+	height: 480px;
+
+	image-rendering : optimize-speed;
+	image-rendering : -moz-crisp-edges;
+	image-rendering : -o-crisp-edges;
+	image-rendering : pixelated;
+}
