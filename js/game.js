@@ -29,7 +29,6 @@ var my_engine = new engine(function(e) {
 	this.init = function () {
 	};
 
-
 	this.update = function(dtime) {
 	};
 });
