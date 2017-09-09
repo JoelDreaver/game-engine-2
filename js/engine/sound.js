@@ -22,33 +22,27 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-function assets () {
-	this.images = {};
-	this.sounds = {};
+function sound (src) {
+	this.audio = new Audio (src);
 
-	this.load = function (src) {
-		if (!this.images[src]) {
-			this.images[src] = new Image ();
-			this.images[src].src = src;
+	this.play = function () {
+		if (!this.audio.ended) {
+			this.stop();
 		}
 
-		return this.images[src];
+		this.audio.play();
 	};
 
-	this.preload = function (src) {
-		this.images[src] = new Image ();
-		this.images[src].src = src;
+	this.pause = function () {
+		this.audio.pause();
 	};
 
-	this.load_sound = function (src) {
-		if (!this.sounds[src]) {
-			this.preload_sound(src);
-		}
-
-		return this.sounds[src];
+	this.stop = function () {
+		this.audio.pause();
+		this.audio.currentTime = 0;
 	};
 
-	this.preload_sound = function (src) {
-		this.sounds[src] = new sound (src);
+	this.volume = function (value) {
+		this.audio.volume = value;
 	};
 }
