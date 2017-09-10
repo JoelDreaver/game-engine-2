@@ -22,6 +22,12 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+var utils = new function () {
+	this.deg2rad = function (deg) {
+		return (deg/180*Math.PI);
+	};
+}();
+
 var UP = 0;
 var DOWN = 1;
 var LEFT = 2;
