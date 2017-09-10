@@ -34,12 +34,20 @@ function particle (sys, pos, velocity) {
 	};
 
 	this.render = function () {
-		this.particle_system.engine.renderer.push ({
-			type : RECT,
-			pos  : this.pos,
-			size : new vec2 (10, 10),
-			color: "#000"
-		});
+		if (this.particle_system.sprite) {
+			this.particle_system.engine.renderer.push ({
+				type : SPRITE,
+				pos  : this.pos,
+				sprite : this.particle_system.sprite
+			});
+		} else {
+			this.particle_system.engine.renderer.push ({
+				type : RECT,
+				pos  : this.pos,
+				size : new vec2 (10, 10),
+				color: "#000"
+			});
+		}
 	};
 };
 
@@ -54,11 +62,13 @@ function particle_system (e, pos, config) {
 	this.velocity = config.velocity || 0;
 	this.dir = config.dir || 0;
 	this.spread = config.spread || 0;
+	this.sprite = config.sprite || null;
 
 	this.random = {
 		dir : config.random.dir || 0,
 		velocity : config.random.velocity || 0
-	}
+	};
+
 
 	this.particles = [];
 	this.timer = 0;
@@ -78,7 +88,7 @@ function particle_system (e, pos, config) {
 				this.emit_timer -= 1/this.amount;
 
 				var r = utils.deg2rad(this.random.dir);
-				var d = utils.deg2rad(this.dir)+(Math.random()*s*2-r);
+				var d = utils.deg2rad(this.dir)+(Math.random()*r*2-r);
 				var s = this.velocity + (Math.random()*this.random.velocity*2-this.random.velocity);
 				var v = new vec2(s*Math.sin(d), s*Math.cos(d));
 				this.particles.push (new particle(this, this.pos, v));

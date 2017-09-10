@@ -9,7 +9,7 @@ var my_engine = new engine(function(e) {
 		this.engine.renderer.push ({
 			type : SPRITE,
 			pos : this.engine.input.mouse.pos.round(),
-			sprite : my_engine.assets.load("doc/examples/res/player.png")
+			sprite : this.engine.assets.load("doc/examples/res/player.png")
 		});
 	};
 });
