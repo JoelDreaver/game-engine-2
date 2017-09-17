@@ -77,3 +77,66 @@ function vec2 (x, y) {
 		return vector;
 	};
 }
+
+function vec3 (x, y, z) {
+	this.x = x;
+	this.y = y;
+	this.z = z;
+
+	this.clone = function () {
+		return (new vec3 (this.x, this.y, this.z));
+	};
+
+	this.eq = function (other) {
+		return (this.x == other.x && this.y == other.y && this.z == other.z);
+	};
+
+	this.add = function (other) {
+		return (new vec3 (this.x + other.x, this.y + other.y, this.z + other.z));
+	};
+
+	this.sub = function (other) {
+		return (new vec3 (this.x - other.x, this.y - other.y, this.z - other.z));
+	};
+
+	this.mul = function (other) {
+		return (new vec3 (this.x * other.x, this.y * other.y, this.z * other.z));
+	};
+
+	this.div = function (other) {
+		return (new vec3 (this.x / other.x, this.y / other.y, this.z / other.z));
+	};
+
+	this.len = function () {
+		return Math.pow(Math.pow(this.x, 2) + Math.pow(this.y, 2) + Math.pow(this.z, 2), 0.5);
+	};
+
+	this.dist_to = function (other) {
+		return this.sub(other).len();
+	};
+
+	this.normalized = function () {
+		var l = this.len();
+		return this.clone().div(new vec3(l, l, l));
+	};
+
+	this.round = function () {
+		var vector = this.clone();
+		vector.x = Math.round(vector.x);
+		vector.y = Math.round(vector.y);
+		vector.z = Math.round(vector.z);
+		return vector;
+	};
+
+	this.floor = function () {
+		var vector = this.clone();
+		vector.x = Math.floor(vector.x);
+		vector.y = Math.floor(vector.y);
+		vector.z = Math.floor(vector.z);
+		return vector;
+	};
+
+	this.to_array = function () {
+		return [this.x, this.y, this.z];
+	};
+}

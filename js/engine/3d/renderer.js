@@ -1,6 +1,4 @@
-<!DOCTYPE html>
-
-<!--
+/*
 
 The MIT License (MIT)
 
@@ -22,33 +20,48 @@ FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TOR
 OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 
--->
+*/
 
-<html>
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link rel="stylesheet" type="text/css" href="css/style.css" media="screen">
-		<title></title>
-	</head>
+// Canvas 3d renderer
+function renderer3d (e) {
+	this.queue = [];
+	this.engine = e;
 
-	<body onload="my_engine.load();">
-		<canvas id="canvas"></canvas>
+	this.ctx = null;
 
-		<!-- engine -->
-		<script src="js/engine/vector.js"></script>
-		<script src="js/engine/utils.js"></script>
-		<script src="js/engine/input.js"></script>
-		<script src="js/engine/sound.js"></script>
-		<script src="js/engine/assets.js"></script>
-		<script src="js/engine/renderer.js"></script>
-		<script src="js/engine/3d/renderer.js"></script>
-		<script src="js/engine/map.js"></script>
-		<script src="js/engine/font.js"></script>
-		<script src="js/engine/particle_system.js"></script>
-		<script src="js/engine/core.js"></script>
+	this.push = function (item) {
+		this.queue.push(item);
+	};
 
-		<!-- game -->
-		<script src="js/game.js"></script>
-	</body>
-</html>
+	this.init = function () {
+		this.ctx = this.engine.canvas.getContext("2d");
+	};
+
+	this.clear = function () {
+		this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+	};
+
+	this.render = function (dtime) {
+	};
+}
+
+// WebGL 3d renderer
+function renderer3d_webgl (e) {
+	this.queue = [];
+	this.engine = e;
+
+	this.ctx = null;
+
+	this.push = function (item) {
+		this.queue.push(item);
+	};
+
+	this.init = function () {
+	};
+
+	this.clear = function () {
+	};
+
+	this.render = function (dtime) {
+	};
+}
