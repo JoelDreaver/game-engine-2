@@ -33,6 +33,7 @@ var CORNER = 1;
 // TODO
 function renderer (e) {
 	this.queue = [];
+	this.layers = [];
 	this.engine = e;
 
 	this.viewport = new vec2 (0, 0);
@@ -50,11 +51,23 @@ function renderer (e) {
 	this.ctx = null;
 
 	this.push = function (item) {
-		this.queue.push(item);
+		var layer = (item.layer || 0);
+		this.queue[layer].push(item);
 	};
+
+	this.push_layer = function (def) {
+		def.scroll_scale = def.scroll_scale || new vec2(1, 1);
+
+		this.layers.push(def);
+		this.queue.push([]);
+
+		return this.layers.length-1;
+	}
 
 	this.init = function () {
 		this.ctx = this.engine.canvas.getContext("2d");
+
+		this.push_layer({});
 	};
 
 	this.clear = function () {
@@ -62,76 +75,80 @@ function renderer (e) {
 	};
 
 	this.render = function (dtime) {
-		this.ctx.translate(this.viewport.x, this.viewport.y);
+		for (var it = 0; it < this.queue.length; it++) {
+			var layer_def = this.layers[it];
 
-		if (this.effects.shake.timer > 0) {
-			this.effects.shake.x = Math.round(Math.random()*this.effects.shake.val - this.effects.shake.val/2);
-			this.effects.shake.y = Math.round(Math.random()*this.effects.shake.val - this.effects.shake.val/2);
+			this.ctx.translate(this.viewport.x*layer_def.scroll_scale.x, this.viewport.y*layer_def.scroll_scale.y);
 
-			this.ctx.translate(this.effects.shake.x, this.effects.shake.y);
-		} else {
-			this.effects.shake.x = 0;
-			this.effects.shake.y = 0;
-		}
+			if (this.effects.shake.timer > 0) {
+				this.effects.shake.x = Math.round(Math.random()*this.effects.shake.val - this.effects.shake.val/2);
+				this.effects.shake.y = Math.round(Math.random()*this.effects.shake.val - this.effects.shake.val/2);
 
-		while (this.queue.length > 0) {
-			var item = this.queue.splice(0, 1)[0];
-
-			this.ctx.translate(item.pos.x, item.pos.y);
-
-			if (item.color) {
-				this.ctx.fillStyle = item.color;
+				this.ctx.translate(this.effects.shake.x, this.effects.shake.y);
 			} else {
-				this.ctx.fillStyle = "#000";
+				this.effects.shake.x = 0;
+				this.effects.shake.y = 0;
 			}
 
-			if (item.alpha) {
-				this.ctx.globalAlpha = item.alpha;
-			} else {
-				this.ctx.globalAlpha = 1;
-			}
+			while (this.queue[it].length > 0) {
+				var item = this.queue[it].splice(0, 1)[0];
 
-			if (item.type == SPRITE) {
-				if (item.mode == CORNER) {
-					this.ctx.drawImage(item.sprite, 0, 0, item.sprite.width, item.sprite.height);
-				} else {
-					this.ctx.drawImage(item.sprite, -(item.sprite.width/2), -(item.sprite.height/2), item.sprite.width, item.sprite.height);
-				}
-			} else if (item.type == SPRITE_ANIMATED) {
-				if (item.mode == CORNER) {
-					this.ctx.drawImage(item.sprite, item.frame.x, item.frame.y, item.frame.w, item.frame.h, 0, 0, item.frame.w, item.frame.h);
-				} else {
-					this.ctx.drawImage(item.sprite, item.frame.x, item.frame.y, item.frame.w, item.frame.h, -(item.frame.w/2), -(item.frame.h/2), item.frame.w, item.frame.h);
-				}
-			} else if (item.type == RECT) {
-				if (item.mode == CORNER) {
-					this.ctx.fillRect(0, 0, item.size.x, item.size.y);
-				} else {
-					this.ctx.fillRect(-(item.size.x/2), -(item.size.y/2), item.size.x, item.size.y);
-				}
-			} else if (item.type == PATH) {
-				with(this.ctx) {
-					beginPath();
+				this.ctx.translate(item.pos.x, item.pos.y);
 
-					moveTo(item.path[0].x, item.path[0].y);
+				if (item.color) {
+					this.ctx.fillStyle = item.color;
+				} else {
+					this.ctx.fillStyle = "#000";
+				}
 
-					for (var j = 1; j < item.path.length; j++) {
-						lineTo(item.path[j].x, item.path[j].y);
+				if (item.alpha) {
+					this.ctx.globalAlpha = item.alpha;
+				} else {
+					this.ctx.globalAlpha = 1;
+				}
+
+				if (item.type == SPRITE) {
+					if (item.mode == CORNER) {
+						this.ctx.drawImage(item.sprite, 0, 0, item.sprite.width, item.sprite.height);
+					} else {
+						this.ctx.drawImage(item.sprite, -(item.sprite.width/2), -(item.sprite.height/2), item.sprite.width, item.sprite.height);
 					}
+				} else if (item.type == SPRITE_ANIMATED) {
+					if (item.mode == CORNER) {
+						this.ctx.drawImage(item.sprite, item.frame.x, item.frame.y, item.frame.w, item.frame.h, 0, 0, item.frame.w, item.frame.h);
+					} else {
+						this.ctx.drawImage(item.sprite, item.frame.x, item.frame.y, item.frame.w, item.frame.h, -(item.frame.w/2), -(item.frame.h/2), item.frame.w, item.frame.h);
+					}
+				} else if (item.type == RECT) {
+					if (item.mode == CORNER) {
+						this.ctx.fillRect(0, 0, item.size.x, item.size.y);
+					} else {
+						this.ctx.fillRect(-(item.size.x/2), -(item.size.y/2), item.size.x, item.size.y);
+					}
+				} else if (item.type == PATH) {
+					with(this.ctx) {
+						beginPath();
 
-					fill();
+						moveTo(item.path[0].x, item.path[0].y);
+
+						for (var j = 1; j < item.path.length; j++) {
+							lineTo(item.path[j].x, item.path[j].y);
+						}
+
+						fill();
+					}
 				}
+
+				this.ctx.translate(-item.pos.x, -item.pos.y);
 			}
 
-			this.ctx.translate(-item.pos.x, -item.pos.y);
+			if (this.effects.shake.timer > 0) {
+				this.ctx.translate(-this.effects.shake.x, -this.effects.shake.y);
+
+				this.effects.shake.timer -= dtime;
+			}
+
+			this.ctx.translate(-this.viewport.x*layer_def.scroll_scale.x, -this.viewport.y*layer_def.scroll_scale.y);
 		}
-
-		if (this.effects.shake.timer > 0) {
-			this.ctx.translate(-this.effects.shake.x, -this.effects.shake.y);
-
-			this.effects.shake.timer -= dtime;
-		}
-
-		this.ctx.translate(-this.viewport.x, -this.viewport.y);
 	};
 }
