@@ -47,9 +47,11 @@ function tileset (e) {
 	};
 }
 
-function map (e, size, tile_size, my_tileset) {
+function map (e, pos, size, tile_size, my_tileset) {
 	this.engine = e;
 	this.size = size;
+
+	this.pos = pos;
 
 	this.tileset = my_tileset;
 	this.tile_size = tile_size;
@@ -97,7 +99,7 @@ function map (e, size, tile_size, my_tileset) {
 					var tile = this.data[i][j];
 
 					if (tile != -1) {
-						this.tileset.render(tile, new vec2(i*this.tile_size.x, j*this.tile_size.y));
+						this.tileset.render(tile, new vec2(i*this.tile_size.x+this.pos.x, j*this.tile_size.y+this.pos.y));
 					}
 				}
 			}
@@ -115,8 +117,8 @@ function map (e, size, tile_size, my_tileset) {
 					var def = this.tileset.tiles[tile];
 
 					if (def.collider) {
-						var my_rect = new rect(i*this.tile_size.x + def.collider.x, j*this.tile_size.x+def.collider.y,
-							i*this.tile_size.x + def.collider.x + def.collider.w, j*this.tile_size.x+def.collider.y + def.collider.h);
+						var my_rect = new rect(i*this.tile_size.x + def.collider.x+this.pos.x, j*this.tile_size.x+def.collider.y+this.pos.y,
+							i*this.tile_size.x + def.collider.x + def.collider.w+this.pos.x, j*this.tile_size.x+def.collider.y + def.collider.h+this.pos.y);
 							my_rect.meta.tile = tile;
 							my_rect.meta.tile_pos = new vec2(i, j);
 							coll.push(my_rect);

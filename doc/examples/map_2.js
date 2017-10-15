@@ -15,8 +15,8 @@ var my_engine = new engine(function(e) {
 		rect : {x:16, y:0, w:16, h:16}
 	});
 
-	// map (engine, size, tile_size)
-	this.map = new map (this.engine, new vec2(10, 8), new vec2(16, 16), this.tileset);
+	// map (engine, pos, size, tile_size)
+	this.map = new map (this.engine, new vec2(0,0), new vec2(10, 8), new vec2(16, 16), this.tileset);
 
 	this.init = function () {
 		// Init map
