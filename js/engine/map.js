@@ -22,89 +22,40 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-function tile (s) {
-	this.sprite = s;
-	this.collider = {
-		x : 0,
-		y : 0,
-		w : 0,
-		h : 0
-	};
-
-	this.render = function (my_map, i, j, id) {
-		my_map.engine.renderer.push({
-			type : SPRITE_ANIMATED,
-
-			frame : {
-				x : my_map.tile_size.x*this.sprite.x,
-				y : my_map.tile_size.y*this.sprite.y,
-				w : my_map.tile_size.x,
-				h : my_map.tile_size.y
-			},
-
-			mode : CORNER,
-			pos : new vec2 (my_map.tile_size.x * i, my_map.tile_size.y * j),
-			sprite : my_map.sprite
-		})
-	};
-};
-
-function tile_connected (s) {
-	this.sprite = s;
-	this.collider = {
-		x : 0,
-		y : 0,
-		w : 0,
-		h : 0
-	}
-
-	this.render = function (my_map, i, j, id) {
-		var a = this.sprite.x;
-		var b = this.sprite.y;
-
-		if (my_map.get_tile(new vec2(i-1, j)) != id) {
-			a -= 1;
-		} else if (my_map.get_tile(new vec2(i+1, j)) != id) {
-			a += 1;
-		}
-
-		if (my_map.get_tile(new vec2(i, j+1)) != id && my_map.get_tile(new vec2(i, j+1)) != -2) {
-			b += 1;
-		} else if (my_map.get_tile(new vec2(i, j-1)) != id && my_map.get_tile(new vec2(i, j-1)) != -2) {
-			b -= 1;
-		}
-
-		my_map.engine.renderer.push({
-			type : SPRITE_ANIMATED,
-
-			frame : {
-				x : a*my_map.tile_size.x,
-				y : b* my_map.tile_size.y,
-				w : my_map.tile_size.x,
-				h : my_map.tile_size.y
-			},
-
-			mode : CORNER,
-			pos : new vec2 (my_map.tile_size.x * i, my_map.tile_size.y * j),
-			sprite : my_map.sprite
-		})
-	};
-};
-
-
-function map (e, size, tile_size) {
+function tileset (e) {
 	this.engine = e;
-	this.size = size;
-	this.tile_size = tile_size;
-
-	this.tiles = [];
-	this.data = [];
-
 	this.sprite = null;
+	this.tiles = [];
 
 	this.init = function (sprite) {
 		this.sprite = sprite;
+	};
 
+	this.push = function (t) {
+		this.tiles.push(t);
+		return this.tiles.length-1;
+	};
+
+	this.render = function (id, pos) {
+		this.engine.renderer.push({
+			type : SPRITE_ANIMATED,
+			frame : this.tiles[id].rect,
+			mode : CORNER,
+			pos : pos,
+			sprite : this.sprite
+		})
+	};
+}
+
+function map (e, size, tile_size, my_tileset) {
+	this.engine = e;
+	this.size = size;
+
+	this.tileset = my_tileset;
+	this.tile_size = tile_size;
+	this.data = [];
+
+	this.init = function () {
 		for (var i = 0; i < this.size.x; i++) {
 			var a = [];
 
@@ -146,15 +97,14 @@ function map (e, size, tile_size) {
 					var tile = this.data[i][j];
 
 					if (tile != -1) {
-						this.tiles[tile].render(this, i, j, tile);
-						//console.log(tile);
+						this.tileset.render(tile, new vec2(i*this.tile_size.x, j*this.tile_size.y));
 					}
 				}
 			}
 		}
 	};
 
-	this.get_colliders = function (ignore) {
+	this.get_colliders = function () {
 		var coll = [];
 
 		for (var i = 0; i < this.data.length; i++) {
@@ -162,11 +112,15 @@ function map (e, size, tile_size) {
 				var tile = this.data[i][j];
 
 				if (tile != -1 && ignore.indexOf(tile) == -1) {
-					var my_rect = new rect(i*this.tile_size.x + this.tiles[tile].collider.x, j*this.tile_size.x+this.tiles[tile].collider.y,
-						(i+1)*this.tile_size.x + this.tiles[tile].collider.w, (j+1)*this.tile_size.x + this.tiles[tile].collider.h);
-					my_rect.meta.tile = tile;
-					my_rect.meta.tile_pos = new vec2(i, j);
-					coll.push(my_rect);
+					var def = this.tileset.tiles[tile];
+
+					if (def.collider) {
+						var my_rect = new rect(i*this.tile_size.x + def.collider.x, j*this.tile_size.x+def.collider.y,
+							i*this.tile_size.x + def.collider.x + def.collider.w, j*this.tile_size.x+def.collider.y + def.collider.h);
+							my_rect.meta.tile = tile;
+							my_rect.meta.tile_pos = new vec2(i, j);
+							coll.push(my_rect);
+					}
 				}
 			}
 		}
