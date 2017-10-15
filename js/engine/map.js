@@ -113,15 +113,16 @@ function map (e, pos, size, tile_size, my_tileset) {
 			for (var j = 0; j < this.data[i].length; j++) {
 				var tile = this.data[i][j];
 
-				if (tile != -1 && ignore.indexOf(tile) == -1) {
+				if (tile != -1) {
 					var def = this.tileset.tiles[tile];
 
 					if (def.collider) {
 						var my_rect = new rect(i*this.tile_size.x + def.collider.x+this.pos.x, j*this.tile_size.x+def.collider.y+this.pos.y,
 							i*this.tile_size.x + def.collider.x + def.collider.w+this.pos.x, j*this.tile_size.x+def.collider.y + def.collider.h+this.pos.y);
-							my_rect.meta.tile = tile;
-							my_rect.meta.tile_pos = new vec2(i, j);
-							coll.push(my_rect);
+
+						my_rect.meta.tile = tile;
+						my_rect.meta.tile_pos = new vec2(i, j);
+						coll.push(my_rect);
 					}
 				}
 			}
