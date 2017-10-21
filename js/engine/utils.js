@@ -26,6 +26,17 @@ var utils = new function () {
 	this.deg2rad = function (deg) {
 		return (deg/180*Math.PI);
 	};
+
+	this.random = {
+		choose : function (x) {
+			return x[Math.floor(Math.random()*x.length)];
+		},
+
+		rand : function (a, b) {
+			var x = b-a;
+			return a+Math.floor(Math.random()*x);
+		}
+	};
 }();
 
 var UP = 0;
