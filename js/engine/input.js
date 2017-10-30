@@ -27,6 +27,7 @@ var MOUSE_UP = 1;
 var MOUSE_MOVE = 2;
 
 var KEY_DOWN = 3;
+var KEY_UP = 4;
 
 function input (e) {
 	this.mouse = {
@@ -48,6 +49,7 @@ function input (e) {
 	this.events_mouse_up = [];
 
 	this.events_key_down = [];
+	this.events_key_up = [];
 
 	this.init = function () {
 		var that = this;
@@ -66,6 +68,10 @@ function input (e) {
 			evt = evt || window.event;
 
 			that.keyboard.pressed[evt.keyCode] = false;
+
+			for (var i = 0; i < that.events_key_up.length; i++) {
+				that.events_key_up[i](evt);
+			}
 		};
 
 		e.canvas.onmousemove = function (evt) {
@@ -115,6 +121,8 @@ function input (e) {
 			this.events_mouse_up.push(func);
 		} else if (evt_type == KEY_DOWN) {
 			this.events_key_down.push(func);
+		} else if (evt_type == KEY_UP) {
+			this.events_key_up.push(func);
 		}
 	}
 }
