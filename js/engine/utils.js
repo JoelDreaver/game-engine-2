@@ -23,6 +23,13 @@ DEALINGS IN THE SOFTWARE.
 */
 
 var utils = new function () {
+	this.dirs = [
+		new vec2 (0, -1),
+		new vec2 (0, 1),
+		new vec2 (-1, 0),
+		new vec2 (1, 0)
+	];
+
 	this.deg2rad = function (deg) {
 		return (deg/180*Math.PI);
 	};

@@ -39,12 +39,12 @@ function engine (my_game) {
 		this.canvas.height = this.game.size.y;
 		//this.ctx = this.canvas.getContext("2d");
 
-		this.input.init();
-		this.game.init();
-
 		if (this.renderer.init) {
 			this.renderer.init();
 		}
+
+		this.input.init();
+		this.game.init();
 
 		window.requestAnimationFrame(this.update);
 	};
