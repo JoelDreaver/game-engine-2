@@ -4,7 +4,7 @@ var my_engine = new engine(function(e) {
 	// Small canvas size
 	this.size = new vec2 (640/8, 480/8);
 
-	this.font = new font (this.engine, null, "1234567890");
+	this.font = new font_simple (this.engine, null, "1234567890");
 	this.num = 0;
 
 	this.init = function () {

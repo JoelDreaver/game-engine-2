@@ -22,7 +22,74 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-function font (e, img, layout) {
+function font (e, layout) {
+	this.engine = e;
+	this.layout = layout;
+	this.space = 1;
+	this.layer = 0;
+	this.newline = 0;
+
+	this.set_sprite = function (spr) {
+		this.sprite = spr;
+	}
+
+	this.render = function (pos, text) {
+		var x = pos.x;
+		var y = pos.y;
+		for (var i = 0; i < text.length; i++) {
+			var chr = text[i];
+
+			if (chr == "\n") {
+				x = pos.x;
+				y += this.newline;
+			} else {
+				this.engine.renderer.push({
+					type : SPRITE_ANIMATED,
+
+					frame : {
+						x : this.layout[chr].x,
+						y : this.layout[chr].y,
+						w : this.layout[chr].w,
+						h : this.layout[chr].h
+					},
+
+					mode : CORNER,
+					pos : new vec2(x, y),
+					sprite : this.sprite,
+					layer: this.layer
+				});
+
+				x += this.layout[chr].w+this.space;
+			}
+		}
+	}
+
+	this.get_text_width = function (text) {
+		var width = 0;
+		var x = 0;
+
+		for (var i = 0; i < text.length; i++) {
+			var chr = text[i];
+
+			if (chr == "\n") {
+				if (x > width) {
+					width = x;
+				}
+				x = 0;
+			} else {
+				x += this.layout[chr].w+this.space;
+			}
+		}
+
+		if (x > width) {
+			width = x;
+		}
+
+		return width;
+	}
+};
+
+function font_simple (e, img, layout) {
 	this.sprite = img;
 	this.layout = layout;
 	this.engine = e;
