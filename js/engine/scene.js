@@ -37,8 +37,7 @@ function scene () {
 	this.remove = function (name) {
 		if (this.ids.hasOwnProperty(name) && this.ids[name] != -1) {
 			var object = this.objects.splice(this.ids[name], 1);
-			this.ids[name] = -1;
-
+			delete this.ids[name];
 			return object[0];
 		}
 	};
