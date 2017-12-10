@@ -26,6 +26,7 @@ function particle (sys, pos, velocity) {
 	this.pos = pos;
 	this.velocity = velocity;
 	this.age = 0;
+	this.color = "#000";
 	this.particle_system = sys;
 
 	this.update = function (dtime) {
@@ -45,7 +46,7 @@ function particle (sys, pos, velocity) {
 				type : RECT,
 				pos  : this.pos,
 				size : new vec2 (10, 10),
-				color: "#000"
+				color: this.color
 			});
 		}
 	};

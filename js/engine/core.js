@@ -34,14 +34,7 @@ function engine (my_game) {
 	this.time_scale = 1;
 
 	this.load = function () {
-		this.canvas = document.getElementById("canvas");
-		this.canvas.width = this.game.size.x;
-		this.canvas.height = this.game.size.y;
-		//this.ctx = this.canvas.getContext("2d");
-
-		if (this.renderer.init) {
-			this.renderer.init();
-		}
+		this.renderer.init();
 
 		this.input.init();
 		this.game.init();

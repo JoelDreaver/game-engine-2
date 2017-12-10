@@ -65,13 +65,17 @@ function renderer (e) {
 	}
 
 	this.init = function () {
+		this.engine.canvas = document.getElementById("canvas");
+		this.engine.canvas.width = this.engine.game.size.x;
+		this.engine.canvas.height = this.engine.game.size.y;
+
 		this.ctx = this.engine.canvas.getContext("2d");
 
 		this.push_layer({});
 	};
 
 	this.clear = function () {
-		this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+		this.ctx.clearRect(0, 0, this.engine.canvas.width, this.engine.canvas.height);
 	};
 
 	this.render = function (dtime) {

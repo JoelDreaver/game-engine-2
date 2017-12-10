@@ -1,6 +1,4 @@
-<!DOCTYPE html>
-
-<!--
+/*
 
 The MIT License (MIT)
 
@@ -22,34 +20,50 @@ FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TOR
 OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 
--->
+*/
 
-<html>
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link rel="stylesheet" type="text/css" href="css/style.css" media="screen">
-		<title></title>
-	</head>
+function scene () {
+	this.ids = {};
+	this.objects = [];
 
-	<body onload="my_engine.load();">
-		<canvas id="canvas"></canvas>
+	this.init = function () {
+	};
 
-		<!-- engine -->
-		<script src="js/engine/vector.js"></script>
-		<script src="js/engine/utils.js"></script>
-		<script src="js/engine/input.js"></script>
-		<script src="js/engine/sound.js"></script>
-		<script src="js/engine/assets.js"></script>
-		<script src="js/engine/renderer.js"></script>
-		<script src="js/engine/3d/renderer.js"></script>
-		<script src="js/engine/scene.js"></script>
-		<script src="js/engine/map.js"></script>
-		<script src="js/engine/font.js"></script>
-		<script src="js/engine/particle_system.js"></script>
-		<script src="js/engine/core.js"></script>
+	this.push = function (name, object) {
+		this.objects.push(object);
+		this.ids[name] = this.objects.length-1;
+	};
 
-		<!-- game -->
-		<script src="js/game.js"></script>
-	</body>
-</html>
+	this.remove = function (name) {
+		if (this.ids.hasOwnProperty(name) && this.ids[name] != -1) {
+			var object = this.objects.splice(this.ids[name], 1);
+			this.ids[name] = -1;
+
+			return object[0];
+		}
+	};
+
+	this.find = function (name) {
+		if (this.ids.hasOwnProperty(name) && this.ids[name] != -1) {
+			return this.objects[this.ids[name]];
+		}
+	};
+
+	this.render = function () {
+		for (var i = 0; i < this.objects.length; i++) {
+			this.objects[i].render ();
+		}
+	};
+
+	this.update = function (dtime) {
+		for (var i = 0; i < this.objects.length; i++) {
+			this.objects[i].update (dtime);
+		}
+	};
+
+	this.render = function () {
+		for (var i = 0; i < this.objects.length; i++) {
+			this.objects[i].render ();
+		}
+	};
+};
