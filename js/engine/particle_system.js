@@ -26,26 +26,33 @@ function particle (sys, pos, velocity) {
 	this.pos = pos;
 	this.velocity = velocity;
 	this.age = 0;
-	this.color = "#000";
+	this.color = sys.color;
 	this.particle_system = sys;
 
 	this.update = function (dtime) {
 		this.age += dtime;
+		this.velocity = this.velocity.add (this.particle_system.gravity.mul(new vec2(dtime, dtime)))
 		this.pos = this.pos.add(this.velocity.mul(new vec2(dtime, dtime)));
 	};
 
 	this.render = function () {
+		if (this.particle_system.round_pos) {
+			var pos = this.pos.round();
+		} else {
+			var pos = this.pos;
+		}
+
 		if (this.particle_system.sprite) {
 			this.particle_system.engine.renderer.push ({
 				type : SPRITE,
-				pos  : this.pos,
+				pos  : pos,
 				sprite : this.particle_system.sprite
 			});
 		} else {
 			this.particle_system.engine.renderer.push ({
 				type : RECT,
-				pos  : this.pos,
-				size : new vec2 (10, 10),
+				pos  : pos,
+				size : this.particle_system.size,
 				color: this.color
 			});
 		}
@@ -63,7 +70,12 @@ function particle_system (e, pos, config) {
 	this.velocity = config.velocity || 0;
 	this.dir = config.dir || 0;
 	this.spread = config.spread || 0;
+	this.gravity = config.gravity || new vec2 (0, 0);
+	this.round_pos = config.round_pos || false;
+
 	this.sprite = config.sprite || null;
+	this.size = config.size || new vec2 (10, 10);
+	this.color = config.color || "#000";
 
 	this.random = {
 		dir : config.random.dir || 0,
