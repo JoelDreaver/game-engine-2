@@ -36,14 +36,24 @@ function tileset (e) {
 		return this.tiles.length-1;
 	};
 
-	this.render = function (id, pos) {
-		this.engine.renderer.push({
-			type : SPRITE_ANIMATED,
-			frame : this.tiles[id].rect,
-			mode : CORNER,
-			pos : pos,
-			sprite : this.sprite
-		})
+	this.render = function (id, variation, pos) {
+		if (this.tiles[id].rects) {
+			this.engine.renderer.push({
+				type : SPRITE_ANIMATED,
+				frame : this.tiles[id].rects[variation],
+				mode : CORNER,
+				pos : pos,
+				sprite : this.sprite
+			});
+		} else {
+			this.engine.renderer.push({
+				type : SPRITE_ANIMATED,
+				frame : this.tiles[id].rect,
+				mode : CORNER,
+				pos : pos,
+				sprite : this.sprite
+			});
+		}
 	};
 }
 
@@ -62,7 +72,7 @@ function map (e, pos, size, tile_size, my_tileset) {
 			var a = [];
 
 			for (var j = 0; j < this.size.y; j++) {
-				a.push(-1);
+				a.push([-1, 0]);
 			}
 
 			this.data.push(a);
@@ -73,7 +83,7 @@ function map (e, pos, size, tile_size, my_tileset) {
 		for (var i = 0; i < this.data.length; i++) {
 			for (var j = 0; j < this.data[i].length; j++) {
 				if (Math.random() > a) {
-					this.data[i][j] = tiles[Math.floor(Math.random()*tiles.length)];
+					this.data[i][j] = [tiles[Math.floor(Math.random()*tiles.length)], 0];
 				}
 			}
 		}
@@ -82,7 +92,7 @@ function map (e, pos, size, tile_size, my_tileset) {
 	this.fill = function (tile) {
 		for (var i = 0; i < this.data.length; i++) {
 			for (var j = 0; j < this.data[i].length; j++) {
-				this.data[i][j] = tile;
+				this.data[i][j] = [tile, 0];
 			}
 		}
 	}
@@ -98,8 +108,11 @@ function map (e, pos, size, tile_size, my_tileset) {
 					this.tile_size.x * (i+1) <= -(this.engine.renderer.viewport.x) + this.engine.game.size.x + this.tile_size.x) {
 					var tile = this.data[i][j];
 
-					if (tile != -1) {
-						this.tileset.render(tile, new vec2(i*this.tile_size.x+this.pos.x, j*this.tile_size.y+this.pos.y));
+					if (tile[0] != -1) {
+						this.tileset.render(
+							tile[0], tile[1],
+							new vec2(i*this.tile_size.x+this.pos.x, j*this.tile_size.y+this.pos.y)
+						);
 					}
 				}
 			}
@@ -113,14 +126,15 @@ function map (e, pos, size, tile_size, my_tileset) {
 			for (var j = 0; j < this.data[i].length; j++) {
 				var tile = this.data[i][j];
 
-				if (tile != -1) {
-					var def = this.tileset.tiles[tile];
+				if (tile[0] != -1) {
+					var def = this.tileset.tiles[tile[0]];
 
 					if (def.collider) {
 						var my_rect = new rect(i*this.tile_size.x + def.collider.x+this.pos.x, j*this.tile_size.x+def.collider.y+this.pos.y,
 							i*this.tile_size.x + def.collider.x + def.collider.w+this.pos.x, j*this.tile_size.x+def.collider.y + def.collider.h+this.pos.y);
 
-						my_rect.meta.tile = tile;
+						my_rect.meta.tile = tile[0];
+						my_rect.meta.variation = tile[1];
 						my_rect.meta.tile_pos = new vec2(i, j);
 						coll.push(my_rect);
 					}
@@ -133,7 +147,7 @@ function map (e, pos, size, tile_size, my_tileset) {
 
 	this.get_tile = function (pos) {
 		if (this.is_on_map(pos)){
-			return this.data[pos.x][pos.y];
+			return this.data[pos.x][pos.y][0];
 		} else {
 			return -2;
 		}
@@ -141,7 +155,7 @@ function map (e, pos, size, tile_size, my_tileset) {
 
 	this.set_tile = function (pos, my_tile) {
 		if (this.is_on_map(pos)){
-			this.data[pos.x][pos.y] = my_tile;
+			this.data[pos.x][pos.y] = [my_tile, 0];
 		} else {
 			return -2;
 		}
