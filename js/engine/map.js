@@ -22,6 +22,11 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
+var AUTO_TILING_NONE = 0;
+var AUTO_TILING_FLOOR = 1;
+var AUTO_TILING_4 = 2;
+var AUTO_TILING_8 = 0;
+
 function tileset (e) {
 	this.engine = e;
 	this.sprite = null;
@@ -35,6 +40,14 @@ function tileset (e) {
 		this.tiles.push(t);
 		return this.tiles.length-1;
 	};
+
+	this.get_auto_tiling_mode = function (id) {
+		if (this.tiles[id].auto_tiling) {
+			return this.tiles[id].auto_tiling;
+		} else {
+			return 0;
+		}
+	}
 
 	this.render = function (id, variation, pos) {
 		if (this.tiles[id].rects) {
@@ -99,6 +112,32 @@ function map (e, pos, size, tile_size, my_tileset) {
 
 	this.is_on_map = function (p) {
 		return (p.x >= 0 && p.y >= 0 && p.x < this.data.length && p.y < this.data[0].length);
+	};
+
+	this.update_auto_tiling = function () {
+		for (var i = 0; i < this.data.length; i++) {
+			for (var j = 0; j < this.data[i].length; j++) {
+				var tile = this.data[i][j][0];
+
+				if (tile != -1) {
+					var mode = this.tileset.get_auto_tiling_mode (tile);
+
+					if (mode == AUTO_TILING_FLOOR) {
+						if (this.get_tile(new vec2(i, j-1)) != tile) {
+							this.data[i][j][1] = 1;
+						} else {
+							this.data[i][j][1] = 0;
+						}
+					} else if (mode == AUTO_TILING_4) {
+
+					} else if (mode == AUTO_TILING_8) {
+
+					} else {
+						this.data[i][j][1] = 0;
+					}
+				}
+			}
+		}
 	};
 
 	this.render = function () {
