@@ -21,7 +21,10 @@ var my_engine = new engine(function(e) {
 
 	this.update = function(dtime) {
 		var inp = this.engine.input;
+		console.log(inp.axis("move"));
 
-		console.log(inp.axis("move") + ", "+ inp.button("jump"));
+		if (inp.button_down("jump")) {
+			console.log ("jump");
+		}
 	};
 });

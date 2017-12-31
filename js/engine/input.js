@@ -57,6 +57,7 @@ function input (e) {
 
 	this.axes = {};
 	this.buttons = {};
+	this.button_names = [];
 
 	this.init = function () {
 		var that = this;
@@ -129,6 +130,10 @@ function input (e) {
 		this.mouse.last_pos = this.mouse.pos.clone();
 		this.keyboard.up = [];
 		this.keyboard.down = [];
+
+		for (var i = 0; i < this.button_names.length; i++) {
+			this.update_button(this.button_names[i]);
+		}
 	};
 
 	this.on = function (evt_type, func) {
@@ -151,6 +156,7 @@ function input (e) {
 
 	this.register_button = function (name, def) {
 		this.buttons[name] = def;
+		this.button_names.push(name);
 	};
 
 	this.axis = function (name) {
@@ -176,6 +182,20 @@ function input (e) {
 		return 0;
 	};
 
+	this.get_gamepad_button_state = function (index, button) {
+		if (!this.gamepads[index]) {
+			return false;
+		}
+
+		var g = this.gamepads[index];
+
+		if (typeof g.buttons[button] == "object") {
+			return g.buttons[button].pressed == true;
+		} else {
+			return g.buttons[button] == 1;
+		}
+	}
+
 	this.button = function (name) {
 		if (this.buttons.hasOwnProperty(name)) {
 			var def = this.buttons[name];
@@ -186,16 +206,10 @@ function input (e) {
 
 			if (typeof def.gamepad_id != "undefined" && typeof def.gamepad_button != "undefined") {
 				if (this.gamepads[def.gamepad_id]) {
-					var g = this.gamepads[def.gamepad_id];
+					var state = this.get_gamepad_button_state (def.gamepad_id, def.gamepad_button);
 
-					if (typeof g.buttons[def.gamepad_button] == "object") {
-						if (g.buttons[def.gamepad_button].pressed) {
-							return true;
-						}
-					} else {
-						if (g.buttons[def.gamepad_button] == 1) {
-							return true;
-						}
+					if (state) {
+						return true;
 					}
 				}
 			}
@@ -203,4 +217,61 @@ function input (e) {
 
 		return false;
 	};
+
+	this.button_down = function (name) {
+		if (this.buttons.hasOwnProperty(name)) {
+			var def = this.buttons[name];
+
+			if (def.key && this.keyboard.down[def.key]) {
+				return true;
+			};
+
+			if (typeof def.gamepad_id != "undefined" && typeof def.gamepad_button != "undefined") {
+				if (this.gamepads[def.gamepad_id]) {
+					var state = this.get_gamepad_button_state (def.gamepad_id, def.gamepad_button);
+					var last_state = this.buttons [name].gamepad_last_state || false;
+
+					if (state && !last_state) {
+						return true;
+					}
+				}
+			}
+		}
+
+		return false;
+	};
+
+	this.button_up = function (name) {
+		if (this.buttons.hasOwnProperty(name)) {
+			var def = this.buttons[name];
+
+			if (def.key && this.keyboard.up[def.key]) {
+				return true;
+			};
+
+			if (typeof def.gamepad_id != "undefined" && typeof def.gamepad_button != "undefined") {
+				if (this.gamepads[def.gamepad_id]) {
+					var state = this.get_gamepad_button_state (def.gamepad_id, def.gamepad_button);
+					var last_state = this.buttons [name].gamepad_last_state || false;
+
+					if (!state && last_state) {
+						return true;
+					}
+				}
+			}
+		}
+
+		return false;
+	};
+
+	this.update_button = function (name) {
+		var def = this.buttons[name];
+
+		if (typeof def.gamepad_id != "undefined" && typeof def.gamepad_button != "undefined") {
+			if (this.gamepads[def.gamepad_id]) {
+				var state = this.get_gamepad_button_state (def.gamepad_id, def.gamepad_button);
+				this.buttons [name].gamepad_last_state = state;
+			}
+		}
+	}
 }

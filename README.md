@@ -8,7 +8,7 @@ A javascript game engine designed to be modular and easy to use.
 	- Draw shapes and sprites
 	- Support for animated sprites
 - Audio
-- Input (Keyboard, Mouse)
+- Input (Keyboard, Mouse, Gamepad)
 - Tile maps
 - Font system
 - Particle systems
