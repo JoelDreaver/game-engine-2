@@ -78,6 +78,64 @@ function renderer (e) {
 		this.ctx.clearRect(0, 0, this.engine.canvas.width, this.engine.canvas.height);
 	};
 
+	this.render_item = function (item) {
+		this.ctx.translate(item.pos.x, item.pos.y);
+		this.ctx.rotate (item.rotation || 0);
+
+		if (item.color) {
+			this.ctx.fillStyle = item.color;
+		} else {
+			this.ctx.fillStyle = "#000";
+		}
+
+		if (item.alpha) {
+			this.ctx.globalAlpha = item.alpha;
+		} else {
+			this.ctx.globalAlpha = 1;
+		}
+
+		if (item.type == SPRITE) {
+			if (item.mode == CORNER) {
+				this.ctx.drawImage(item.sprite, 0, 0, item.sprite.width, item.sprite.height);
+			} else {
+				this.ctx.drawImage(item.sprite, -(item.sprite.width/2), -(item.sprite.height/2), item.sprite.width, item.sprite.height);
+			}
+		} else if (item.type == SPRITE_ANIMATED) {
+			if (item.mode == CORNER) {
+				this.ctx.drawImage(item.sprite, item.frame.x, item.frame.y, item.frame.w, item.frame.h, 0, 0, item.frame.w, item.frame.h);
+			} else {
+				this.ctx.drawImage(item.sprite, item.frame.x, item.frame.y, item.frame.w, item.frame.h, -(item.frame.w/2), -(item.frame.h/2), item.frame.w, item.frame.h);
+			}
+		} else if (item.type == RECT) {
+			if (item.mode == CORNER) {
+				this.ctx.fillRect(0, 0, item.size.x, item.size.y);
+			} else {
+				this.ctx.fillRect(-(item.size.x/2), -(item.size.y/2), item.size.x, item.size.y);
+			}
+		} else if (item.type == PATH) {
+			with(this.ctx) {
+				beginPath();
+
+				moveTo(item.path[0].x, item.path[0].y);
+
+				for (var j = 1; j < item.path.length; j++) {
+					lineTo(item.path[j].x, item.path[j].y);
+				}
+
+				fill();
+			}
+		}
+
+		if (item.children) {
+			for (var i = 0; i < item.children.length; i++) {
+				this.render_item (item.children[i]);
+			}
+		}
+
+		this.ctx.rotate (-item.rotation || 0);
+		this.ctx.translate(-item.pos.x, -item.pos.y);
+	};
+
 	this.render = function (dtime) {
 		for (var it = 0; it < this.queue.length; it++) {
 			var layer_def = this.layers[it];
@@ -96,54 +154,7 @@ function renderer (e) {
 
 			while (this.queue[it].length > 0) {
 				var item = this.queue[it].splice(0, 1)[0];
-
-				this.ctx.translate(item.pos.x, item.pos.y);
-
-				if (item.color) {
-					this.ctx.fillStyle = item.color;
-				} else {
-					this.ctx.fillStyle = "#000";
-				}
-
-				if (item.alpha) {
-					this.ctx.globalAlpha = item.alpha;
-				} else {
-					this.ctx.globalAlpha = 1;
-				}
-
-				if (item.type == SPRITE) {
-					if (item.mode == CORNER) {
-						this.ctx.drawImage(item.sprite, 0, 0, item.sprite.width, item.sprite.height);
-					} else {
-						this.ctx.drawImage(item.sprite, -(item.sprite.width/2), -(item.sprite.height/2), item.sprite.width, item.sprite.height);
-					}
-				} else if (item.type == SPRITE_ANIMATED) {
-					if (item.mode == CORNER) {
-						this.ctx.drawImage(item.sprite, item.frame.x, item.frame.y, item.frame.w, item.frame.h, 0, 0, item.frame.w, item.frame.h);
-					} else {
-						this.ctx.drawImage(item.sprite, item.frame.x, item.frame.y, item.frame.w, item.frame.h, -(item.frame.w/2), -(item.frame.h/2), item.frame.w, item.frame.h);
-					}
-				} else if (item.type == RECT) {
-					if (item.mode == CORNER) {
-						this.ctx.fillRect(0, 0, item.size.x, item.size.y);
-					} else {
-						this.ctx.fillRect(-(item.size.x/2), -(item.size.y/2), item.size.x, item.size.y);
-					}
-				} else if (item.type == PATH) {
-					with(this.ctx) {
-						beginPath();
-
-						moveTo(item.path[0].x, item.path[0].y);
-
-						for (var j = 1; j < item.path.length; j++) {
-							lineTo(item.path[j].x, item.path[j].y);
-						}
-
-						fill();
-					}
-				}
-
-				this.ctx.translate(-item.pos.x, -item.pos.y);
+				this.render_item (item);
 			}
 
 			if (this.effects.shake.timer > 0) {
