@@ -26,6 +26,7 @@ var AUTO_TILING_NONE = 0;
 var AUTO_TILING_FLOOR = 1;
 var AUTO_TILING_4 = 2;
 var AUTO_TILING_8 = 0;
+var AUTO_TILING_ROTATE = 4;
 
 function tileset (e) {
 	this.engine = e;
@@ -127,6 +128,23 @@ function map (e, pos, size, tile_size, my_tileset) {
 							this.data[i][j][1] = 1;
 						} else {
 							this.data[i][j][1] = 0;
+						}
+					} else if (mode == AUTO_TILING_ROTATE) {
+						var tile_up = this.get_tile(new vec2(i, j-1));
+						var tile_down = this.get_tile(new vec2(i, j+1));
+						var tile_left = this.get_tile(new vec2(i+1, j));
+						var tile_right = this.get_tile(new vec2(i-1, j));
+
+						if (tile_up == -1) {
+							this.data[i][j][1] = 1;
+						} else if (tile_down == -1) {
+							this.data[i][j][1] = 0;
+						} else if (tile_left == -1) {
+							this.data[i][j][1] = 3;
+						} else if (tile_right == -1) {
+							this.data[i][j][1] = 2;
+						} else {
+							this.data[i][j][1] = 1;
 						}
 					} else if (mode == AUTO_TILING_4) {
 
